@@ -1,0 +1,8 @@
+Pillow>=10.0
+rembg[gpu]
+onnxruntime-gpu
+websocket-client
+requests
+playwright
+numpy
+scipy

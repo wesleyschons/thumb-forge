@@ -1,0 +1,132 @@
+{
+  "template_id": "reaction_split",
+  "name": "Reaction Split Screen",
+  "description": "Split screen antes/depois para transformacoes e comparacoes",
+  "canvas": { "width": 1280, "height": 720 },
+  "layers": [
+    {
+      "id": "background",
+      "type": "ai_generated",
+      "z_index": 0,
+      "generation": {
+        "model": "flux_dev_q5",
+        "resolution": [1024, 576],
+        "upscale_to": [1280, 720],
+        "steps": 20,
+        "cfg": 1.0,
+        "prompt_context": "dramatic split background, left side dark moody, right side bright golden, diagonal split, cinematic, 16:9",
+        "negative_prompt": "text, watermark, person, face, letters"
+      },
+      "position": { "x": 0, "y": 0 },
+      "size": { "w": 1280, "h": 720 },
+      "effects": [
+        { "type": "brightness", "value": -15 }
+      ]
+    },
+    {
+      "id": "split_divider",
+      "type": "ai_generated",
+      "z_index": 1,
+      "optional": true,
+      "generation": {
+        "model": "flux_dev_q5",
+        "resolution": [128, 720],
+        "steps": 10,
+        "cfg": 1.0,
+        "prompt_context": "vertical lightning bolt energy beam, white blue glow, black background, vertical"
+      },
+      "position": { "x": 576, "y": 0 },
+      "size": { "w": 128, "h": 720 },
+      "effects": [
+        { "type": "glow", "color": "#4FC3F7", "radius": 15, "intensity": 0.8 }
+      ]
+    },
+    {
+      "id": "person_left",
+      "type": "cutout_photo",
+      "z_index": 2,
+      "source": "host_photo",
+      "position": { "x": -20, "y": 30 },
+      "size": { "w": 580, "h": 690 },
+      "anchor": "bottom_left",
+      "effects": [
+        { "type": "desaturate", "amount": 0.6 },
+        { "type": "drop_shadow", "offset": [5, 5], "blur": 12, "color": [0, 0, 0, 200] }
+      ],
+      "requirements": {
+        "expression": ["sad", "worried", "before"],
+        "facing": "right"
+      }
+    },
+    {
+      "id": "person_right",
+      "type": "cutout_photo",
+      "z_index": 3,
+      "source": "host_photo_after",
+      "position": { "x": 720, "y": 30 },
+      "size": { "w": 580, "h": 690 },
+      "anchor": "bottom_right",
+      "effects": [
+        { "type": "color_grade", "warmth": 15 },
+        { "type": "drop_shadow", "offset": [-5, 5], "blur": 12, "color": [0, 0, 0, 200] }
+      ],
+      "requirements": {
+        "expression": ["happy", "confident", "after"],
+        "facing": "left"
+      }
+    },
+    {
+      "id": "text_top",
+      "type": "text_rendered",
+      "z_index": 10,
+      "text_config": {
+        "max_words": 4,
+        "font_weight": 900,
+        "font_family": "from_brand",
+        "font_size_range": [64, 96],
+        "color": "from_brand.text.primary_text",
+        "stroke_width": 4,
+        "stroke_color": "from_brand.text.stroke",
+        "text_transform": "uppercase",
+        "letter_spacing": 2
+      },
+      "position": { "x": 200, "y": 10 },
+      "size": { "w": 880, "h": 160 },
+      "alignment": "center"
+    },
+    {
+      "id": "text_bottom",
+      "type": "text_rendered",
+      "z_index": 11,
+      "optional": true,
+      "text_config": {
+        "max_words": 3,
+        "font_weight": 800,
+        "font_family": "from_brand",
+        "font_size_range": [36, 56],
+        "color": "from_brand.text.accent_text",
+        "stroke_width": 3,
+        "stroke_color": "from_brand.text.stroke"
+      },
+      "position": { "x": 300, "y": 610 },
+      "size": { "w": 680, "h": 100 },
+      "alignment": "center"
+    },
+    {
+      "id": "border",
+      "type": "shape",
+      "z_index": 12,
+      "optional": true,
+      "shape": "rounded_rect_border",
+      "color": "from_brand.style.border_color",
+      "border_width": 6,
+      "border_radius": 12,
+      "position": { "x": 0, "y": 0 },
+      "size": { "w": 1280, "h": 720 }
+    }
+  ],
+  "safe_zones": {
+    "duration_overlay": { "x": 1140, "y": 640, "w": 140, "h": 80 },
+    "avoid_placing_text_here": true
+  }
+}

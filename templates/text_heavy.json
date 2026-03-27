@@ -1,0 +1,102 @@
+{
+  "template_id": "text_heavy",
+  "name": "Texto Dominante",
+  "description": "Background AI + texto grande dominante (sem foto de host)",
+  "canvas": { "width": 1280, "height": 720 },
+  "layers": [
+    {
+      "id": "background",
+      "type": "ai_generated",
+      "z_index": 0,
+      "generation": {
+        "model": "flux_dev_q5",
+        "resolution": [1024, 576],
+        "upscale_to": [1280, 720],
+        "steps": 20,
+        "cfg": 1.0,
+        "prompt_context": "{theme_atmosphere} abstract background, dark dramatic lighting, cinematic color grading, no text, no people, 16:9",
+        "negative_prompt": "text, watermark, person, face, letters, words"
+      },
+      "position": { "x": 0, "y": 0 },
+      "size": { "w": 1280, "h": 720 },
+      "effects": [
+        { "type": "brightness", "value": -30 },
+        { "type": "gaussian_blur", "radius": 3 },
+        { "type": "vignette", "intensity": 0.5 }
+      ]
+    },
+    {
+      "id": "center_element",
+      "type": "ai_generated",
+      "z_index": 1,
+      "optional": true,
+      "generation": {
+        "model": "flux_dev_q5",
+        "resolution": [512, 512],
+        "steps": 15,
+        "cfg": 1.0,
+        "prompt_context": "single {visual_element} icon, centered, glowing, dramatic lighting, black background, no text",
+        "negative_prompt": "text, watermark, multiple objects, background clutter"
+      },
+      "position": { "x": 390, "y": 200 },
+      "size": { "w": 500, "h": 400 },
+      "effects": [
+        { "type": "glow", "color": "from_theme", "radius": 25, "intensity": 0.7 }
+      ]
+    },
+    {
+      "id": "text_top",
+      "type": "text_rendered",
+      "z_index": 10,
+      "text_config": {
+        "max_words": 4,
+        "font_weight": 900,
+        "font_family": "from_brand",
+        "font_size_range": [96, 140],
+        "color": "from_brand.text.primary_text",
+        "stroke_width": 6,
+        "stroke_color": "from_brand.text.stroke",
+        "text_transform": "uppercase",
+        "letter_spacing": 3
+      },
+      "position": { "x": 80, "y": 80 },
+      "size": { "w": 1120, "h": 300 },
+      "alignment": "center"
+    },
+    {
+      "id": "text_bottom",
+      "type": "text_rendered",
+      "z_index": 11,
+      "optional": true,
+      "text_config": {
+        "max_words": 4,
+        "font_weight": 800,
+        "font_family": "from_brand",
+        "font_size_range": [48, 72],
+        "color": "from_brand.text.accent_text",
+        "stroke_width": 4,
+        "stroke_color": "from_brand.text.stroke",
+        "text_transform": "uppercase"
+      },
+      "position": { "x": 200, "y": 520 },
+      "size": { "w": 880, "h": 160 },
+      "alignment": "center"
+    },
+    {
+      "id": "border",
+      "type": "shape",
+      "z_index": 12,
+      "optional": true,
+      "shape": "rounded_rect_border",
+      "color": "from_brand.style.border_color",
+      "border_width": 8,
+      "border_radius": 20,
+      "position": { "x": 0, "y": 0 },
+      "size": { "w": 1280, "h": 720 }
+    }
+  ],
+  "safe_zones": {
+    "duration_overlay": { "x": 1140, "y": 640, "w": 140, "h": 80 },
+    "avoid_placing_text_here": true
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "brand_id": "fernandoliberal",
+  "channel": "@fernandoliberaloficial",
+  "colors": {
+    "primary": "#C0392B",
+    "secondary": "#F39C12",
+    "accent": "#E74C3C",
+    "dark": "#1A1A2E",
+    "light": "#FFFFFF"
+  },
+  "text": {
+    "primary_text": "#FFFFFF",
+    "accent_text": "#FF4444",
+    "stroke": "#000000",
+    "highlight": "#FFD700"
+  },
+  "typography": {
+    "primary_font": "Montserrat",
+    "weights": [800, 900],
+    "fallback": "Impact, Arial Black, sans-serif"
+  },
+  "style": {
+    "border_color": "#C0392B",
+    "use_border": true,
+    "border_width": 6,
+    "glow_color": "#FF6B35",
+    "theme_moods": ["fire", "divine", "dramatic", "prophetic"]
+  },
+  "host_photos_dir": "D:\\Dev\\ThumbForge\\assets\\hosts\\fernando"
+}

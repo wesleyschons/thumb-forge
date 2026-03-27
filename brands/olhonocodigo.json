@@ -1,0 +1,30 @@
+{
+  "brand_id": "olhonocodigo",
+  "channel": "@olhonocodigo",
+  "colors": {
+    "primary": "#00D4FF",
+    "secondary": "#7B2FBE",
+    "accent": "#00FF88",
+    "dark": "#0A0E27",
+    "light": "#E0E0E0"
+  },
+  "text": {
+    "primary_text": "#FFFFFF",
+    "accent_text": "#00FF88",
+    "stroke": "#0A0E27",
+    "highlight": "#00D4FF"
+  },
+  "typography": {
+    "primary_font": "Inter",
+    "weights": [800, 900],
+    "fallback": "Arial Black, Helvetica, sans-serif"
+  },
+  "style": {
+    "border_color": "#00D4FF",
+    "use_border": true,
+    "border_width": 4,
+    "glow_color": "#00D4FF",
+    "theme_moods": ["tech", "cyber", "neon", "futuristic"]
+  },
+  "host_photos_dir": "D:\\Dev\\ThumbForge\\assets\\hosts\\olhonocodigo"
+}

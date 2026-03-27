@@ -1,0 +1,30 @@
+{
+  "brand_id": "default",
+  "channel": "generic",
+  "colors": {
+    "primary": "#FF4444",
+    "secondary": "#FFD700",
+    "accent": "#FF6B35",
+    "dark": "#1A1A1A",
+    "light": "#FFFFFF"
+  },
+  "text": {
+    "primary_text": "#FFFFFF",
+    "accent_text": "#FFD700",
+    "stroke": "#000000",
+    "highlight": "#FF4444"
+  },
+  "typography": {
+    "primary_font": "Montserrat",
+    "weights": [800, 900],
+    "fallback": "Impact, Arial Black, sans-serif"
+  },
+  "style": {
+    "border_color": "#FF4444",
+    "use_border": false,
+    "border_width": 4,
+    "glow_color": "#FF6B35",
+    "theme_moods": ["dramatic", "dark", "fire", "cosmic"]
+  },
+  "host_photos_dir": "D:\\Dev\\ThumbForge\\assets\\hosts\\default"
+}

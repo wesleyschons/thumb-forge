@@ -1,0 +1,92 @@
+{
+  "template_id": "collage_epic",
+  "name": "Colagem Epica",
+  "description": "Multiplas figuras + cenario grandioso + texto (estilo profecia/apocaliptico)",
+  "canvas": { "width": 1280, "height": 720 },
+  "layers": [
+    {
+      "id": "background",
+      "type": "ai_generated",
+      "z_index": 0,
+      "generation": {
+        "model": "flux_dev_q5",
+        "resolution": [1280, 720],
+        "steps": 25,
+        "cfg": 1.0,
+        "prompt_context": "epic wide shot {scene_description}, cinematic movie poster composition, dramatic sky, hyper detailed, 16:9"
+      },
+      "position": { "x": 0, "y": 0 },
+      "size": { "w": 1280, "h": 720 }
+    },
+    {
+      "id": "figure_center",
+      "type": "ai_generated",
+      "z_index": 1,
+      "generation": {
+        "model": "flux_dev_q5",
+        "resolution": [512, 768],
+        "steps": 20,
+        "cfg": 1.0,
+        "prompt_context": "{central_figure_description}, portrait, dramatic lighting, dark background"
+      },
+      "position": { "x": 390, "y": 0 },
+      "size": { "w": 500, "h": 720 },
+      "effects": [
+        { "type": "blend_mode", "mode": "screen" }
+      ]
+    },
+    {
+      "id": "figure_left",
+      "type": "cutout_photo_or_ai",
+      "z_index": 2,
+      "position": { "x": -30, "y": 100 },
+      "size": { "w": 350, "h": 450 },
+      "effects": [
+        { "type": "desaturate", "amount": 0.5 },
+        { "type": "drop_shadow", "offset": [5, 5], "blur": 15, "color": [0, 0, 0, 180] }
+      ]
+    },
+    {
+      "id": "figure_right",
+      "type": "cutout_photo_or_ai",
+      "z_index": 3,
+      "position": { "x": 960, "y": 100 },
+      "size": { "w": 350, "h": 450 },
+      "effects": [
+        { "type": "desaturate", "amount": 0.5 },
+        { "type": "drop_shadow", "offset": [-5, 5], "blur": 15, "color": [0, 0, 0, 180] }
+      ]
+    },
+    {
+      "id": "text_subtitle",
+      "type": "text_rendered",
+      "z_index": 10,
+      "optional": true,
+      "text_config": {
+        "max_words": 4,
+        "font_size_range": [36, 48],
+        "color": "#FFFFFF",
+        "font_weight": 600,
+        "letter_spacing": 6,
+        "text_transform": "uppercase"
+      },
+      "position": { "x": 200, "y": 420 },
+      "size": { "w": 880, "h": 60 }
+    },
+    {
+      "id": "text_main",
+      "type": "text_rendered",
+      "z_index": 11,
+      "text_config": {
+        "max_words": 3,
+        "font_size_range": [96, 140],
+        "color": "from_brand.text.accent_text",
+        "font_weight": 900,
+        "stroke_width": 5,
+        "stroke_color": "#000000"
+      },
+      "position": { "x": 100, "y": 480 },
+      "size": { "w": 1080, "h": 200 }
+    }
+  ]
+}

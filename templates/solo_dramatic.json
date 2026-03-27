@@ -1,0 +1,58 @@
+{
+  "template_id": "solo_dramatic",
+  "name": "Solo Dramatico",
+  "description": "Uma pessoa com fundo cinematografico e texto impactante",
+  "canvas": { "width": 1280, "height": 720 },
+  "layers": [
+    {
+      "id": "background",
+      "type": "ai_generated",
+      "z_index": 0,
+      "generation": {
+        "model": "flux_dev_q5",
+        "resolution": [1024, 576],
+        "upscale_to": [1280, 720],
+        "steps": 20,
+        "cfg": 1.0,
+        "prompt_context": "cinematic {theme_atmosphere} background, dramatic volumetric lighting, dark edges, 16:9",
+        "negative_prompt": "text, watermark, person, face"
+      },
+      "position": { "x": 0, "y": 0 },
+      "size": { "w": 1280, "h": 720 },
+      "effects": [
+        { "type": "vignette", "intensity": 0.4 }
+      ]
+    },
+    {
+      "id": "person_main",
+      "type": "cutout_photo",
+      "z_index": 1,
+      "source": "host_photo",
+      "position": { "x": 50, "y": 0 },
+      "size": { "w": 650, "h": 720 },
+      "anchor": "bottom_left",
+      "effects": [
+        { "type": "drop_shadow", "offset": [8, 4], "blur": 20, "color": [0, 0, 0, 200] },
+        { "type": "rim_light", "color": "from_theme", "intensity": 0.3, "side": "right" }
+      ]
+    },
+    {
+      "id": "text_main",
+      "type": "text_rendered",
+      "z_index": 10,
+      "text_config": {
+        "max_words": 4,
+        "font_weight": 900,
+        "font_family": "from_brand",
+        "font_size_range": [72, 120],
+        "color": "from_brand.text.primary_text",
+        "stroke_width": 5,
+        "stroke_color": "from_brand.text.stroke",
+        "text_transform": "uppercase"
+      },
+      "position": { "x": 580, "y": 100 },
+      "size": { "w": 660, "h": 520 },
+      "alignment": "right"
+    }
+  ]
+}
