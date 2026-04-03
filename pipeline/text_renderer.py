@@ -2,11 +2,11 @@
 text_renderer.py — Renderiza texto da thumb via Chrome headless
 
 Gera HTML com CSS styled text -> screenshot via Playwright -> PNG transparente.
-Isso garante:
-- Fontes Google Fonts perfeitas
-- Stroke/outline preciso
-- Sombra de texto
-- Kerning e tracking profissional
+Suporta:
+- Highlight bars (retângulos coloridos atrás de palavras-chave)
+- Texto multi-cor (palavras específicas em cores diferentes)
+- Stroke/outline pesado estilo YouTube BR
+- Sombras agressivas
 """
 import asyncio
 from pathlib import Path
@@ -36,19 +36,35 @@ HTML_TEMPLATE = """
     color: {color};
     text-transform: {text_transform};
     letter-spacing: {letter_spacing}px;
-    line-height: 1.1;
+    line-height: {line_height};
     text-align: {text_align};
     -webkit-text-stroke: {stroke_width}px {stroke_color};
     paint-order: stroke fill;
     text-shadow:
-      0 0 10px rgba(0,0,0,0.8),
-      0 4px 8px rgba(0,0,0,0.6);
+      0 0 15px rgba(0,0,0,0.9),
+      0 0 30px rgba(0,0,0,0.7),
+      0 4px 8px rgba(0,0,0,0.8),
+      2px 2px 0px {stroke_color},
+      -2px -2px 0px {stroke_color};
     word-wrap: break-word;
     max-width: 100%;
     padding: 10px;
   }}
   .highlight {{
     color: {highlight_color};
+    -webkit-text-stroke: {stroke_width}px {highlight_stroke_color};
+  }}
+  .highlight-bar {{
+    background: {highlight_bar_color};
+    padding: 2px 12px;
+    display: inline;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }}
+  .small {{
+    font-size: {small_font_size}px;
+    display: block;
+    margin-top: 4px;
   }}
 </style>
 </head>
@@ -86,9 +102,13 @@ class TextRenderer:
         stroke_color: str = "#000000",
         text_transform: str = "uppercase",
         letter_spacing: int = 2,
+        line_height: float = 1.05,
         text_align: str = "center",
         highlight_color: str = "#FF4444",
+        highlight_stroke_color: str = "#000000",
+        highlight_bar_color: str = "transparent",
         highlight_words: list[str] | None = None,
+        use_highlight_bar: bool = False,
         output_path: str = "text_layer.png"
     ) -> str:
         """Renderiza texto como PNG transparente."""
@@ -100,14 +120,17 @@ class TextRenderer:
         text_html = text
         if highlight_words:
             for word in highlight_words:
+                css_class = "highlight-bar highlight" if use_highlight_bar else "highlight"
                 text_html = text_html.replace(
                     word,
-                    f'<span class="highlight">{word}</span>'
+                    f'<span class="{css_class}">{word}</span>'
                 )
 
         # font_family para URL (com +) e para CSS (com espaço)
         font_family_url = font_family.replace(" ", "+")
         font_family_css = font_family
+
+        bar_color = highlight_bar_color if use_highlight_bar else "transparent"
 
         html = HTML_TEMPLATE.format(
             font_family=font_family_url,
@@ -116,16 +139,20 @@ class TextRenderer:
             width=width,
             height=height,
             font_size=font_size,
+            small_font_size=int(font_size * 0.6),
             color=color,
             stroke_width=stroke_width,
             stroke_color=stroke_color,
             text_transform=text_transform,
             letter_spacing=letter_spacing,
+            line_height=line_height,
             text_align=text_align,
             vertical_align="center",
             horizontal_align="center",
             text_html=text_html,
-            highlight_color=highlight_color
+            highlight_color=highlight_color,
+            highlight_stroke_color=highlight_stroke_color,
+            highlight_bar_color=bar_color
         )
 
         page = await self.context.new_page()

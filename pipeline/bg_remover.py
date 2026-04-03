@@ -24,7 +24,7 @@ class BackgroundRemover:
         self,
         input_path: str,
         output_path: str | None = None,
-        alpha_matting: bool = True,
+        alpha_matting: bool = False,
         foreground_threshold: int = 240,
         background_threshold: int = 10
     ) -> Image.Image:

@@ -26,7 +26,7 @@ class ThumbCompositor:
         layer = image.convert("RGBA")
 
         if size:
-            layer = layer.resize(size, Image.LANCZOS)
+            layer = self._fit_preserve_aspect(layer, size)
 
         if effects:
             for effect in effects:
@@ -242,6 +242,22 @@ class ThumbCompositor:
         output = self.canvas.convert("RGB")  # YouTube não suporta alpha
         output.save(path, "PNG", optimize=optimize)
         return path
+
+    @staticmethod
+    def _fit_preserve_aspect(img: Image.Image, size: tuple[int, int]) -> Image.Image:
+        """Redimensiona mantendo aspect ratio, encaixando dentro do size."""
+        target_w, target_h = size
+        orig_w, orig_h = img.size
+        ratio = min(target_w / orig_w, target_h / orig_h)
+        new_w = int(orig_w * ratio)
+        new_h = int(orig_h * ratio)
+        resized = img.resize((new_w, new_h), Image.LANCZOS)
+        # Criar canvas transparente no tamanho alvo, centralizar imagem
+        result = Image.new("RGBA", (target_w, target_h), (0, 0, 0, 0))
+        offset_x = (target_w - new_w) // 2
+        offset_y = target_h - new_h  # Alinhar embaixo (pessoas ancoradas ao chão)
+        result.paste(resized, (offset_x, offset_y), resized)
+        return result
 
     @staticmethod
     def _hex_to_rgba(hex_color: str, alpha: int = 255) -> tuple:

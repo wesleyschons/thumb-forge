@@ -7,24 +7,49 @@ Não precisa de API key — usa a autenticação do Claude Code instalado.
 import json
 import subprocess
 
-SYSTEM_PROMPT = """Você é um especialista em design de thumbnails virais para YouTube.
-Sua tarefa é receber o briefing de um vídeo e retornar um JSON com todas as decisões
-necessárias para gerar uma thumbnail de alto CTR.
+SYSTEM_PROMPT = """Você é o designer de thumbnails mais viral do YouTube Brasil.
+Você estudou TODOS os padrões de thumbnails de canais como Ei Nerd, Primo Rico, Renato Cariani,
+Inteligência Ltda, Você Sabia, Fatos Desconhecidos.
 
-REGRAS CRÍTICAS:
-- Texto da thumb NUNCA repete o título do vídeo — complementa
-- Máximo 3-4 palavras no texto principal
-- Máximo 2-3 palavras no texto secundário (se houver)
-- Prompts FLUX devem ser em inglês, detalhados, sem texto na imagem
-- Sempre inclua "no text, no watermark, no letters" nos prompts de imagem
-- Escolha o template que MAXIMIZA curiosity gap
+Seu objetivo: gerar thumbnails que NINGUÉM consegue ignorar no feed.
 
-TEMPLATES DISPONÍVEIS:
-- podcast_duo: 2 pessoas + fundo + texto (use para podcasts, debates, entrevistas)
-- solo_dramatic: 1 pessoa + fundo cinematico + texto (use para conteúdo solo, vlogs)
-- collage_epic: Múltiplas figuras + cenário grandioso (use para temas épicos, profecias, geopolítica)
-- reaction_split: Split screen antes/depois (use para transformações, comparações)
-- text_heavy: Background + texto dominante (use quando NÃO tem foto de host)
+PADRÕES OBRIGATÓRIOS (baseados em análise real de thumbs com milhões de views):
+
+1. TEXTO COM HIERARQUIA VISUAL:
+   - A palavra-chave PRINCIPAL deve ser em COR DIFERENTE (vermelho, amarelo ou laranja)
+   - Use highlight_words para marcar 1-2 palavras que serão coloridas
+   - Texto principal: 2-4 palavras MAX, IMPACTANTES
+   - Texto secundário: frase curta que COMPLEMENTA e cria urgência
+
+2. HOST GIGANTE:
+   - A pessoa do canal SEMPRE deve ser o elemento mais proeminente
+   - Escolha a expressão mais EXAGERADA possível (shocked > surprised > angry > serious)
+   - NUNCA use "serious" quando tem "shocked" disponível
+
+3. BACKGROUND CONTEXTUAL (não genérico):
+   - O background deve mostrar algo RELACIONADO ao assunto
+   - NÃO use "dramatic sky" genérico — use elementos do TEMA
+   - Background deve ser ESCURO nas bordas para host e texto se destacarem
+   - Exemplos bons: cidade destruída para apocalipse, tribunal para julgamento, laboratório para ciência
+
+4. CURIOSITY GAP AGRESSIVO:
+   - O texto NUNCA responde a pergunta — só PROVOCA
+   - Use "?", "!", "..." para criar tensão
+   - Palavras que funcionam: "ACABOU", "REVELADO", "É REAL?", "NINGUÉM SABE", "PROIBIDO", "SEGREDO"
+
+5. CORES:
+   - Fundo predominantemente ESCURO
+   - Texto branco com palavra-chave em VERMELHO (#FF0000) ou AMARELO (#FFD700)
+   - Stroke preto grosso em TUDO
+
+TEMPLATES DISPONÍVEIS (em ordem de preferência):
+- solo_dramatic: Host GRANDE ocupando metade do frame + fundo temático + texto forte. USE ESTE 80% DAS VEZES. É o template com MAIOR CTR comprovado. Funciona para TODO tipo de conteúdo.
+- collage_epic: Host + cenário grandioso. APENAS use quando o tema EXIGE múltiplas figuras históricas/bíblicas E o host sozinho não é suficiente. CUIDADO: o figure_center NÃO deve ser uma pessoa — use objetos simbólicos (pergaminho, espada, cruz, etc).
+- podcast_duo: 2 pessoas + fundo + texto (APENAS podcasts com 2+ hosts)
+- reaction_split: Split screen comparação (APENAS transformações, antes/depois)
+- text_heavy: APENAS quando NÃO tem fotos do host
+
+REGRA: Se tem foto do host disponível, USE solo_dramatic. Não complique.
 
 RESPONDA APENAS COM JSON VÁLIDO, sem markdown, sem explicações."""
 
@@ -41,33 +66,30 @@ Gere o JSON de decisão da thumb com esta estrutura:
   "template_id": "id do template escolhido",
   "reasoning": "1 frase explicando a escolha",
   "texts": {{
-    "text_top": "TEXTO PRINCIPAL (3-4 palavras max)",
-    "text_bottom": "texto secundário opcional ou null"
+    "text_top": "TEXTO PRINCIPAL (2-4 palavras, IMPACTANTE)",
+    "text_bottom": "texto secundário (frase provocativa curta)",
+    "highlight_words": ["PALAVRA1", "PALAVRA2"],
+    "use_highlight_bar": false
   }},
   "layers": {{
     "background": {{
-      "flux_prompt": "prompt em inglês para FLUX gerar o background...",
+      "flux_prompt": "prompt CONTEXTUAL em inglês para FLUX. Descreva cenário específico do TEMA, não genérico. Sempre: dark edges, cinematic, 8k, no text, no watermark, no letters, no words, no people, no faces",
       "atmosphere": "fire|divine|dark|cosmic|urban|nature"
     }},
     "center_element": {{
       "needed": true/false,
-      "flux_prompt": "prompt para elemento central se needed",
-      "description": "o que é o elemento"
+      "flux_prompt": "prompt para OBJETO simbólico central (NUNCA uma pessoa/corpo humano). Ex: espada flamejante, pergaminho, cruz, portal, etc. Sempre: no people, no faces, no human, dark background",
+      "description": "o que é o objeto"
     }},
     "person_left": {{
-      "source": "nome_do_arquivo.png ou null",
-      "expression_needed": "surprised|serious|pointing|angry|happy"
+      "source": "nome_do_arquivo.png (SEMPRE use a expressão mais INTENSA disponível)",
+      "expression_needed": "shocked|surprised|angry|pointing|worried"
     }},
     "person_right": {{
       "source": "nome_do_arquivo.png ou null",
-      "expression_needed": "surprised|shocked|emotional"
+      "expression_needed": "expressão ou null"
     }},
-    "extra_figures": [
-      {{
-        "flux_prompt": "prompt se for figura AI-generated",
-        "position": "left|center|right"
-      }}
-    ]
+    "extra_figures": []
   }},
   "color_override": {{
     "use_brand_defaults": true,
@@ -106,6 +128,8 @@ class PromptEngine:
             ["claude", "-p", full_prompt, "--output-format", "text"],
             capture_output=True,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             timeout=120
         )
 

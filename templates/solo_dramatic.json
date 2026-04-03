@@ -1,7 +1,7 @@
 {
   "template_id": "solo_dramatic",
   "name": "Solo Dramatico",
-  "description": "Uma pessoa com fundo cinematografico e texto impactante",
+  "description": "Host GRANDE com fundo temático escuro e texto forte — máximo CTR",
   "canvas": { "width": 1280, "height": 720 },
   "layers": [
     {
@@ -14,26 +14,26 @@
         "upscale_to": [1280, 720],
         "steps": 20,
         "cfg": 1.0,
-        "prompt_context": "cinematic {theme_atmosphere} background, dramatic volumetric lighting, dark edges, 16:9",
-        "negative_prompt": "text, watermark, person, face"
+        "prompt_context": "cinematic dark background, dramatic volumetric lighting, 16:9"
       },
       "position": { "x": 0, "y": 0 },
       "size": { "w": 1280, "h": 720 },
       "effects": [
-        { "type": "vignette", "intensity": 0.4 }
+        { "type": "vignette", "intensity": 0.6 },
+        { "type": "brightness", "value": -20 }
       ]
     },
     {
       "id": "person_main",
       "type": "cutout_photo",
-      "z_index": 1,
+      "z_index": 5,
       "source": "host_photo",
-      "position": { "x": 50, "y": 0 },
-      "size": { "w": 650, "h": 720 },
+      "position": { "x": -40, "y": 0 },
+      "size": { "w": 750, "h": 720 },
       "anchor": "bottom_left",
       "effects": [
-        { "type": "drop_shadow", "offset": [8, 4], "blur": 20, "color": [0, 0, 0, 200] },
-        { "type": "rim_light", "color": "from_theme", "intensity": 0.3, "side": "right" }
+        { "type": "drop_shadow", "offset": [12, 8], "blur": 30, "color": [0, 0, 0, 240] },
+        { "type": "rim_light", "color": "from_theme", "intensity": 0.5, "side": "right" }
       ]
     },
     {
@@ -44,15 +44,47 @@
         "max_words": 4,
         "font_weight": 900,
         "font_family": "from_brand",
-        "font_size_range": [72, 120],
+        "font_size_range": [80, 130],
         "color": "from_brand.text.primary_text",
-        "stroke_width": 5,
+        "stroke_width": 6,
         "stroke_color": "from_brand.text.stroke",
-        "text_transform": "uppercase"
+        "text_transform": "uppercase",
+        "letter_spacing": 3
       },
-      "position": { "x": 580, "y": 100 },
-      "size": { "w": 660, "h": 520 },
+      "position": { "x": 520, "y": 40 },
+      "size": { "w": 740, "h": 440 },
       "alignment": "right"
+    },
+    {
+      "id": "text_secondary",
+      "type": "text_rendered",
+      "z_index": 11,
+      "optional": true,
+      "text_config": {
+        "max_words": 5,
+        "font_weight": 800,
+        "font_family": "from_brand",
+        "font_size_range": [28, 40],
+        "color": "from_brand.text.accent_text",
+        "stroke_width": 3,
+        "stroke_color": "from_brand.text.stroke",
+        "text_transform": "uppercase",
+        "letter_spacing": 3
+      },
+      "position": { "x": 520, "y": 490 },
+      "size": { "w": 740, "h": 110 },
+      "alignment": "right"
+    },
+    {
+      "id": "border",
+      "type": "shape",
+      "z_index": 20,
+      "shape": "rounded_rect_border",
+      "color": "from_brand.style.border_color",
+      "border_width": 6,
+      "border_radius": 0,
+      "position": { "x": 0, "y": 0 },
+      "size": { "w": 1280, "h": 720 }
     }
   ]
 }

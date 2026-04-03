@@ -120,7 +120,7 @@ class ComfyUIClient:
                 }
             },
             "2": {
-                "class_type": "CLIPLoaderGGUF",
+                "class_type": "DualCLIPLoaderGGUF",
                 "inputs": {
                     "clip_name1": "clip_l.safetensors",
                     "clip_name2": "t5-v1_1-xxl-encoder-Q4_K_M.gguf",

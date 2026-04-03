@@ -164,8 +164,28 @@ class ThumbForge:
                 layer_plan = plan["layers"].get(layer_id, {})
                 photo_source = layer_plan.get("source")
 
+                # Se não encontrou no plano, tentar mapear aliases comuns
+                if not photo_source:
+                    alias_map = {
+                        "person_main": ["person_left", "person_right"],
+                        "person_left": ["person_main"],
+                        "person_right": ["person_main"],
+                        "figure_left": ["person_left", "person_main"],
+                        "figure_right": ["person_right", "person_main"],
+                    }
+                    for alias in alias_map.get(layer_id, []):
+                        alias_plan = plan["layers"].get(alias, {})
+                        if alias_plan.get("source"):
+                            photo_source = alias_plan["source"]
+                            break
+
                 if photo_source:
-                    photo_path = Path(ASSETS_DIR) / "hosts" / photo_source
+                    # Usar host_photos_dir do brand
+                    photos_dir = Path(brand.get("host_photos_dir", ""))
+                    photo_path = photos_dir / photo_source
+                    if not photo_path.exists():
+                        # Fallback: caminho antigo
+                        photo_path = Path(ASSETS_DIR) / "hosts" / photo_source
                     if photo_path.exists():
                         print(f"  Recortando '{layer_id}': {photo_source}")
                         cutout = self.bg_remover.remove_background(str(photo_path))
@@ -176,6 +196,14 @@ class ThumbForge:
                 elif layer["type"] == "cutout_photo_or_ai":
                     # Gerar via AI como fallback
                     flux_prompt = layer_plan.get("flux_prompt", "")
+                    # Procurar nos extra_figures do plano
+                    if not flux_prompt:
+                        position_map = {"figure_left": "left", "figure_right": "right"}
+                        target_pos = position_map.get(layer_id, "")
+                        for fig in plan["layers"].get("extra_figures", []):
+                            if fig.get("position") == target_pos and fig.get("flux_prompt"):
+                                flux_prompt = fig["flux_prompt"]
+                                break
                     if flux_prompt:
                         print(f"  Gerando '{layer_id}' via AI...")
                         img_bytes = self.comfyui.generate_image(
@@ -194,8 +222,19 @@ class ThumbForge:
         for layer in template["layers"]:
             if layer["type"] == "text_rendered":
                 layer_id = layer["id"]
-                text_key = layer_id.replace("text_", "text_")
-                text_content = plan["texts"].get(text_key) or plan["texts"].get(layer_id)
+                # Mapear layer_id para chaves do plano
+                text_key_map = {
+                    "text_main": ["text_main", "text_top"],
+                    "text_secondary": ["text_secondary", "text_bottom"],
+                    "text_top": ["text_top", "text_main"],
+                    "text_bottom": ["text_bottom", "text_secondary"],
+                    "text_subtitle": ["text_subtitle", "text_bottom", "text_secondary"],
+                }
+                text_content = None
+                for key in text_key_map.get(layer_id, [layer_id]):
+                    text_content = plan["texts"].get(key)
+                    if text_content:
+                        break
 
                 if not text_content:
                     if layer.get("optional"):
@@ -210,8 +249,25 @@ class ThumbForge:
                 stroke_color = self._resolve_brand_value(tc.get("stroke_color", "#000000"), brand)
                 highlight_color = brand.get("text", {}).get("highlight", "#FFD700")
 
-                # Determinar font size (usar o maior do range)
-                font_size = tc.get("font_size_range", [72, 96])[-1]
+                # Determinar font size — auto-sizing baseado no comprimento do texto
+                font_size_range = tc.get("font_size_range", [72, 96])
+                max_font = font_size_range[-1]
+                min_font = font_size_range[0]
+                # Reduzir font size para textos longos (> ~12 chars)
+                text_len = len(text_content)
+                if text_len > 16:
+                    font_size = min_font
+                elif text_len > 10:
+                    ratio = (16 - text_len) / 6
+                    font_size = int(min_font + (max_font - min_font) * ratio)
+                else:
+                    font_size = max_font
+
+                # Highlight words do plano
+                highlight_words = plan.get("texts", {}).get("highlight_words", [])
+                use_highlight_bar = plan.get("texts", {}).get("use_highlight_bar", False)
+                highlight_bar_color = brand.get("colors", {}).get("primary", "#C0392B")
+                accent_color = brand.get("text", {}).get("accent_text", "#FF4444")
 
                 print(f"  Renderizando '{layer_id}': \"{text_content}\"")
 
@@ -226,11 +282,15 @@ class ThumbForge:
                     font_weight=tc.get("font_weight", 900),
                     font_size=font_size,
                     color=color,
-                    stroke_width=tc.get("stroke_width", 4),
+                    stroke_width=tc.get("stroke_width", 5),
                     stroke_color=stroke_color,
                     text_transform=tc.get("text_transform", "uppercase"),
                     letter_spacing=tc.get("letter_spacing", 2),
-                    highlight_color=highlight_color,
+                    highlight_color=accent_color,
+                    highlight_stroke_color=stroke_color,
+                    highlight_bar_color=highlight_bar_color,
+                    highlight_words=highlight_words if layer_id in ("text_main", "text_top") else None,
+                    use_highlight_bar=use_highlight_bar,
                     output_path=output_path
                 )
 
@@ -324,6 +384,9 @@ class ThumbForge:
         """Resolve referências 'from_brand.xxx' para valores reais."""
         if isinstance(value, str) and value.startswith("from_brand"):
             parts = value.split(".")
+            if len(parts) == 1:
+                # "from_brand" sem path — retorna primary_font como default
+                return brand.get("typography", {}).get("primary_font", "Montserrat")
             current = brand
             for part in parts[1:]:
                 current = current.get(part, {})
